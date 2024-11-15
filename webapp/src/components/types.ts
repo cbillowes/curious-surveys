@@ -17,7 +17,7 @@ export interface TextBoxProps {
 }
 
 export interface PasswordProps extends TextBoxProps {
-  revealPassword: boolean;
+  revealPassword?: boolean;
 }
 
 export interface ButtonProps {

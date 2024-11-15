@@ -10,19 +10,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TextBox } from "@/components/textbox";
 import { Button } from "@/components/button";
+import { User } from "@/schemas";
+import { Password } from "@/components/password";
 
-const schema = z.object({
-  email: z.string().email("Invalid email address"),
-  fullName: z.string().min(2, "Full name is required"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .max(64, "Password must be less than 64 characters")
-    .regex(/[a-z]/i, "Password must contain at least one letter")
-    .regex(/\d/, "Password must contain at least one digit"),
-});
-
-type FormData = z.infer<typeof schema>;
+type FormData = z.infer<typeof User>;
 
 export default function RegisterForm() {
   const {
@@ -30,7 +21,7 @@ export default function RegisterForm() {
     handleSubmit,
     formState: { errors, touchedFields },
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(User),
   });
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -41,10 +32,8 @@ export default function RegisterForm() {
     try {
       setLoading(true);
       setError("");
-      await registerWithPassword(data.email, data.password, {
-        fullName: data.fullName,
-      });
-      router.push("/dashboard");
+      await registerWithPassword(data);
+      // router.push("/login");
     } catch (error: unknown) {
       if (error instanceof Error) {
         setError(error.message);
@@ -77,7 +66,7 @@ export default function RegisterForm() {
         </Link>
         <div className="w-full p-6 mx-auto bg-white rounded-lg shadow dark:bg-gray-800 sm:max-w-xl lg:col-span-6 sm:p-8">
           <h1 className="mb-2 text-2xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white">
-            Create your Account
+            Create your Account.
           </h1>
           <p className="text-md font-light text-gray-500 dark:text-gray-300">
             Create your account in seconds. Already have an account?{" "}
@@ -95,7 +84,7 @@ export default function RegisterForm() {
           >
             <div className="grid gap-3 sm:grid-cols-1">
               <TextBox
-                type="email"
+                type="text"
                 label="Email address"
                 placeholder="alex@example.com"
                 message={errors?.email?.message}
@@ -111,7 +100,7 @@ export default function RegisterForm() {
                 isSuccess={touchedFields.fullName && !errors.fullName}
                 {...register("fullName")}
               />
-              <TextBox
+              <Password
                 label="Password"
                 placeholder="********"
                 message={errors?.password?.message}
@@ -123,7 +112,6 @@ export default function RegisterForm() {
                 type="submit"
                 theme="primary"
                 isLoading={loading}
-                onClick={() => {}}
               >
                 Create your Account
               </Button>

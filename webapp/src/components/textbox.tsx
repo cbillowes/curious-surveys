@@ -13,6 +13,7 @@ export const TextBox = ({
   prefix,
   suffix,
   type = "text",
+  ...rest
 }: TextBoxProps) => {
   return (
     <div className="mb-4 relative">
@@ -27,6 +28,7 @@ export const TextBox = ({
         {label}
       </label>
       <input
+        {...rest}
         id={name}
         name={name}
         type={type}
