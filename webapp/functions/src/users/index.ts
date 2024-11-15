@@ -1,6 +1,7 @@
 import { Auth } from "firebase-admin/auth";
 import { Firestore } from "firebase-admin/firestore";
 import { z, ZodError } from "zod";
+import { ZodValidationError } from "../errors";
 
 const collectionPath = "users";
 
@@ -11,9 +12,17 @@ interface User {
 }
 
 const schema = z.object({
-  fullName: z.string(),
-  email: z.string().email(),
-  password: z.string(),
+  fullName: z.string({
+    required_error: "Full name is required",
+  }),
+  email: z
+    .string({
+      required_error: "Email is required",
+    })
+    .email(),
+  password: z.string({
+    required_error: "Password is required",
+  }),
 });
 
 const validateUserProfile = (userProfile: unknown): boolean => {
@@ -22,7 +31,7 @@ const validateUserProfile = (userProfile: unknown): boolean => {
     return true;
   } catch (error: unknown) {
     if (error instanceof ZodError) {
-      throw new Error(`Invalid user profile: ${error.errors}`);
+      throw new ZodValidationError("Invalid profile", error.errors);
     }
     return false;
   }

@@ -14,17 +14,6 @@ import * as logger from "firebase-functions/logger";
 
 // https://firebase.google.com/docs/functions/config-env?gen=2nd#emulator_support
 
-// const API_KEY = defineString("API_KEY").value();
-// const AUTH_DOMAIN = defineString("AUTH_DOMAIN").value();
-// const PROJECT_ID = defineString("PROJECT_ID").value();
-// const STORAGE_BUCKET = defineString("STORAGE_BUCKET").value();
-// const MESSAGING_SENDER_ID = defineString("MESSAGING_SENDER_ID").value();
-// const APP_ID = defineString("APP_ID").value();
-// const MEASUREMENT_ID = defineString("MEASUREMENT_ID").value();
-// const WHITELISTED_DOMAINS = ;
-
-// console.log("API_KEY", API_KEY);
-
 // Note: Cloud Functions for Firebase (2nd gen) does not provide support for the
 // events and triggers described in this guide. Because 1st gen and 2nd gen functions
 // can coexist side-by-side in the same source file, you can still develop and deploy this functionality
@@ -33,6 +22,7 @@ import * as logger from "firebase-functions/logger";
 import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
 import { createNewUser } from "./users/index.js";
+import { ZodValidationError } from "./errors.js";
 
 admin.initializeApp();
 
@@ -69,8 +59,13 @@ export const registerUser = onRequest(async (request, response) => {
       response.send();
       return;
     } catch (error: unknown) {
+      if (error instanceof ZodValidationError) {
+        logger.error("Failed to create new user:", error.message);
+        response.status(400).send(error.message);
+        return;
+      }
       logger.error("Failed to create new user:", error);
-      response.status(400).send("Failed to create new user");
+      response.status(500).send("Something went wrong");
       return;
     }
   }
