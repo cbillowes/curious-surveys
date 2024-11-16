@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint src/",
     "build": "npm run lint && tsc",
-    "build:watch": "GOOGLE_DEFAULT_APPLICATION='./key.json' nodemon --watch 'src/**' --ext 'ts,json' --exec 'npm run lint && tsc'",
+    "dev": "GOOGLE_DEFAULT_APPLICATION='./key.json' nodemon --watch 'src/**' --ext 'ts,json' --exec 'npm run lint && tsc'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

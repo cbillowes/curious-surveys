@@ -10,7 +10,6 @@
 
 import { onRequest } from "firebase-functions/v2/https";
 import { defineString } from "firebase-functions/params";
-import * as logger from "firebase-functions/logger";
 
 // https://firebase.google.com/docs/functions/config-env?gen=2nd#emulator_support
 
@@ -19,57 +18,40 @@ import * as logger from "firebase-functions/logger";
 // can coexist side-by-side in the same source file, you can still develop and deploy this functionality
 // together with 2nd gen functions.
 // https://firebase.google.com/docs/auth/extend-with-functions
-import * as functions from "firebase-functions/v1";
+import { Request, Response } from "firebase-functions/v1";
 import * as admin from "firebase-admin";
-import { createNewUser } from "./users/index.js";
-import { ZodValidationError } from "./errors.js";
+import { createNewUser } from "./api.js";
+
+const whitelisting = defineString("WHITELISTED_DOMAINS");
 
 admin.initializeApp();
 
-const db = admin.firestore();
-const auth = admin.auth();
-
 const withOptions = (
-  request: functions.Request,
-  response: functions.Response<unknown, Record<string, unknown>>,
-  { methods, headers }: { methods: string; headers: string }
+  request: Request,
+  response: Response<unknown, Record<string, unknown>>,
+  { methods, headers }: { methods: string; headers: string },
+  next: (
+    request: Request,
+    response: Response<unknown, Record<string, unknown>>
+  ) => void
 ) => {
   if (request.method === "OPTIONS") {
-    response.set(
-      "Access-Control-Allow-Origin",
-      defineString("WHITELISTED_DOMAINS").value()
-    );
+    response.set("Access-Control-Allow-Origin", whitelisting.value());
     response.set("Access-Control-Allow-Methods", methods);
     response.set("Access-Control-Allow-Headers", headers);
     response.status(204).send("");
   }
+  next(request, response);
 };
 
 // http://127.0.0.1:5001/curious-surveys/us-central1/registerUser
 export const registerUser = onRequest(async (request, response) => {
-  if (request.method === "OPTIONS") {
-    return withOptions(request, response, {
-      methods: "POST, OPTIONS",
-      headers: "Content-Type",
-    });
-  }
-  if (request.method === "POST") {
-    try {
-      await createNewUser(auth, db, request.body);
-      response.send();
-      return;
-    } catch (error: unknown) {
-      if (error instanceof ZodValidationError) {
-        logger.error("Failed to create new user:", error.message);
-        response.status(400).send(error.message);
-        return;
-      }
-      logger.error("Failed to create new user:", error);
-      response.status(500).send("Something went wrong");
-      return;
-    }
-  }
-  response.status(405).send("Method Not Allowed");
+  withOptions(
+    request,
+    response,
+    { methods: "POST, OPTIONS", headers: "Content-Type" },
+    createNewUser(admin.auth(), admin.firestore())
+  );
 });
 
 // export const sendWelcomeEmail = functions.auth.user().onCreate(async (user) => {

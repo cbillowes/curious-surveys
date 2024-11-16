@@ -5,7 +5,7 @@ import { ZodValidationError } from "../errors";
 
 const collectionPath = "users";
 
-interface User {
+export interface User {
   fullName: string;
   email: string;
   password: string;
@@ -37,7 +37,7 @@ const validateUserProfile = (userProfile: unknown): boolean => {
   }
 };
 
-export const createNewUser = async (
+const createNew = async (
   auth: Auth,
   db: Firestore,
   user: User
@@ -57,4 +57,8 @@ export const createNewUser = async (
       created: new Date().toISOString(),
     });
   return;
+};
+
+export default {
+  createNew,
 };
