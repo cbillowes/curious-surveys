@@ -1,4 +1,4 @@
-import clsx from "classnames";
+import { twMerge } from "tailwind-merge";
 import { ButtonProps } from "@/components/types";
 
 export const Button = ({
@@ -12,7 +12,8 @@ export const Button = ({
     <button
       type={type}
       disabled={isLoading}
-      className={clsx(
+      className={twMerge(
+        "flex items-center justify-center",
         "w-full px-4 py-2 text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2",
         "bg-gray-500 hover:bg-gray-600 focus:ring-gray-500",
         theme === "primary" &&

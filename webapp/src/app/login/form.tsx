@@ -1,8 +1,9 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,7 +16,7 @@ import { registerNewUserWithPassword } from "@/app/register/page";
 
 type FormData = z.infer<typeof User>;
 
-export default function RegisterForm() {
+export default function LoginForm() {
   const {
     register,
     handleSubmit,
@@ -62,15 +63,15 @@ export default function RegisterForm() {
         </Link>
         <div className="w-full p-6 mx-auto bg-white rounded-lg shadow dark:bg-gray-800 sm:max-w-xl lg:col-span-6 sm:p-8">
           <h1 className="mb-2 text-2xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white">
-            Create your Account.
+            Welcome back.
           </h1>
           <p className="text-md font-light text-gray-500 dark:text-gray-300">
-            Create your account in seconds. Already have an account?{" "}
+            Log in to your account. Don&#8216;t have one?{" "}
             <Link
-              href="/login"
+              href="/register"
               className="font-medium text-primary-600 hover:underline dark:text-primary-500"
             >
-              Login here
+              Create one now
             </Link>
             .
           </p>
@@ -79,14 +80,6 @@ export default function RegisterForm() {
             className="mt-4 space-y-6 sm:mt-6"
           >
             <div className="grid gap-3 sm:grid-cols-1">
-              <TextBox
-                type="text"
-                label="Full name"
-                message={errors?.fullName?.message}
-                isErrored={!!errors.fullName}
-                isSuccess={touchedFields.fullName && !errors.fullName}
-                {...register("fullName")}
-              />
               <TextBox
                 type="text"
                 label="Email address"

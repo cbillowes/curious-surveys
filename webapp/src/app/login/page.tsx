@@ -1,9 +1,9 @@
-import RegisterForm from "@/app/register/form";
+import LoginForm from "@/app/login/form";
 import { FIREBASE_FUNCTIONS_DOMAIN } from "@/constants";
 import { User } from "@/types";
 
 export async function registerNewUserWithPassword(user: User): Promise<Response> {
-  return fetch(`${FIREBASE_FUNCTIONS_DOMAIN}/userWithPassword`, {
+  return fetch(`${FIREBASE_FUNCTIONS_DOMAIN}/authenticateWithPassword`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -12,10 +12,10 @@ export async function registerNewUserWithPassword(user: User): Promise<Response>
   });
 }
 
-export default function RegisterPage() {
+export default function LoginPage() {
   return (
     <main>
-      <RegisterForm />
+      <LoginForm />
     </main>
   );
 }

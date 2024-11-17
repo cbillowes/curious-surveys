@@ -1,11 +1,30 @@
 import { z } from "zod";
 
 export const User = z.object({
-  email: z.string(), //.email("Invalid email address"),
-  fullName: z.string(), //.min(2, "Full name is required"),
-  password: z.string(),
-  // .min(8, "Password must be at least 8 characters")
-  // .max(64, "Password must be less than 64 characters")
-  // .regex(/[a-z]/i, "Password must contain at least one letter")
-  // .regex(/\d/, "Password must contain at least one digit"),
+  fullName: z.string().min(1, {
+    message: "Full name is required",
+  }),
+  email: z.string().email({
+    message: "Invalid email address",
+  }),
+  password: z
+    .string()
+    .min(8, {
+      message: "Password must be at least 8 characters",
+    })
+    .max(50, {
+      message: "Password must be at most 50 characters",
+    })
+    .regex(/[a-z]/, {
+      message: "Password must contain at least one lowercase letter",
+    })
+    .regex(/[A-Z]/, {
+      message: "Password must contain at least one uppercase letter",
+    })
+    .regex(/[0-9]/, {
+      message: "Password must contain at least one digit",
+    })
+    .regex(/[^a-zA-Z0-9]/, {
+      message: "Password must contain at least one special character",
+    }),
 });

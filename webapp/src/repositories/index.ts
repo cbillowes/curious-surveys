@@ -1,6 +1,6 @@
-import { NEXT_PUBLIC_FIREBASE_FUNCTIONS_DOMAIN } from "@/constants";
+import { FIREBASE_FUNCTIONS_DOMAIN } from "@/constants";
 
-const DOMAIN = NEXT_PUBLIC_FIREBASE_FUNCTIONS_DOMAIN;
+const DOMAIN = FIREBASE_FUNCTIONS_DOMAIN;
 
 export const POST = async (url: string, data: unknown) => {
   const apiEndpoint = `${DOMAIN}/${url}`;

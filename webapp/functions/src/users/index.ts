@@ -18,7 +18,7 @@ const schema = z.object({
   fullName: z.string().min(1, {
     message: "Full name is required",
   }),
-  email: z.string().min(1).email({
+  email: z.string().email({
     message: "Invalid email address",
   }),
   password: z
