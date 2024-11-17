@@ -1,29 +1,21 @@
 import * as logger from "firebase-functions/logger";
 import { Auth } from "firebase-admin/auth";
 import { Firestore } from "firebase-admin/firestore";
-import { ZodValidationError } from "./errors";
 import { Request, Response } from "firebase-functions/v1";
-import userRepository, { User } from "./users";
+import { createUserWithPassword } from "./users/api";
+import { User } from "./users";
 
-export const createNewUser =
+export const manageUserWithPassword =
   (auth: Auth, db: Firestore) =>
   async (
     request: Request,
     response: Response<unknown, Record<string, unknown>>
   ): Promise<void> => {
     if (request.method === "POST") {
-      try {
-        await userRepository.createNew(auth, db, request.body as User);
-        response.send();
-      } catch (error: unknown) {
-        if (error instanceof ZodValidationError) {
-          logger.error("Failed to create new user:", error.message);
-          response.status(400).send(error.message);
-        }
-        logger.error("Failed to create new user:", error);
-        response.status(500).send("Something went wrong");
-      }
+      createUserWithPassword(auth, db, response, request.body as User);
     } else {
-      response.status(405).send("Method Not Allowed");
+      logger.warn(`Method not allowed: ${request.method}`);
+      response.status(405).send({ message: "Method not allowed." });
+      return;
     }
   };

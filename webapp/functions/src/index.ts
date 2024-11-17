@@ -20,7 +20,7 @@ import { defineString } from "firebase-functions/params";
 // https://firebase.google.com/docs/auth/extend-with-functions
 import { Request, Response } from "firebase-functions/v1";
 import * as admin from "firebase-admin";
-import { createNewUser } from "./api.js";
+import { manageUserWithPassword } from "./api.js";
 
 const whitelisting = defineString("WHITELISTED_DOMAINS");
 
@@ -29,7 +29,6 @@ admin.initializeApp();
 const withOptions = (
   request: Request,
   response: Response<unknown, Record<string, unknown>>,
-  { methods, headers }: { methods: string; headers: string },
   next: (
     request: Request,
     response: Response<unknown, Record<string, unknown>>
@@ -37,20 +36,21 @@ const withOptions = (
 ) => {
   if (request.method === "OPTIONS") {
     response.set("Access-Control-Allow-Origin", whitelisting.value());
-    response.set("Access-Control-Allow-Methods", methods);
-    response.set("Access-Control-Allow-Headers", headers);
+    response.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    response.set("Access-Control-Allow-Headers", "Content-Type");
+    response.set("Access-Control-Max-Age", "3600");
     response.status(204).send("");
+    return;
   }
   next(request, response);
 };
 
 // http://127.0.0.1:5001/curious-surveys/us-central1/registerUser
-export const registerUser = onRequest(async (request, response) => {
+export const userWithPassword = onRequest(async (request, response) => {
   withOptions(
     request,
     response,
-    { methods: "POST, OPTIONS", headers: "Content-Type" },
-    createNewUser(admin.auth(), admin.firestore())
+    manageUserWithPassword(admin.auth(), admin.firestore())
   );
 });
 
